@@ -7,7 +7,10 @@ import { JWT_SECRET } from "../config/config";
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {
+  
   const { username, email, password } = req.body;
+
+  console.log({username, email, password})
 
   try {
     let user = await User.findOne({ email });

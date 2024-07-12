@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import User, { IUser } from "../models/User";
+import { CustomRequest } from "../utils/customRequest";
 
 
 
-export const getUserProfile = async (req: Request|any, res: Response): Promise<void> => {
+export const getUserProfile = async (req: CustomRequest, res: Response): Promise<void> => {
    try {
-     const user = await User.findById(req.userId).select('-password');
+     const user = await User.findById(req.user!.id).select('-password');
      if (!user) {
        res.status(404).json({ message: 'User not found' });
        return;

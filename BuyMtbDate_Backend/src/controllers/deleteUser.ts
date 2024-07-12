@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import User from "../models/User";
 
 
-
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   const userId = req.params.id;
 
@@ -17,7 +16,6 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
     await User.findByIdAndDelete(userId);
     res.json({ message: 'User deleted' });
   } catch (error) {
-    console.error('Error deleting user:', error);
     res.status(500).send('Server Error');
   }
 };

@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
-// import session from "express-session";
+import session from "express-session";
+import allRoute from "./routes/allRoutes";
+import userRoute from "./routes/userRoutes";
 
 
 
@@ -17,12 +19,15 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
-// app.use(session({
-//    secret: 'your_secret_key',
-//    resave: false,
-//    saveUninitialized: true,
-//    cookie: { secure: false } 
-//  }));
+app.use(session({
+   secret: 'your_secret_key',
+   resave: false,
+   saveUninitialized: true,
+   cookie: { secure: false } 
+ }));
+
+app.use('/api/auth', allRoute)
+app.use('/api', userRoute)
 
 const connect = async (): Promise<void> => {
 try { await mongoose.connect(process.env.MONGO_URI!);
