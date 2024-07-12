@@ -1,3 +1,41 @@
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
+
+
+
+export default defineComponent({
+  name: 'Register',
+  setup() {
+    const router = useRouter();
+    const username = ref('');
+    const password = ref('');
+    const email = ref('')
+
+    const handleRegister = async () => {
+
+      console.log({username:username.value, email:email.value, password:password.value})
+      try {
+        const response = await axios.post(import.meta.env.VITE_REGISTER_API_URL, { username:username.value, email:email.value, password: password.value });
+        router.push('/userDashboard');
+      } catch (error) {
+        console.error('Error registering:', error);
+      }
+    };
+
+    return {
+      username,
+      password,
+      email,
+      handleRegister,
+    };
+  },
+});
+</script>
+
+
+
 <template>
   <div class="register-container">
     <div class="register-card">
@@ -17,37 +55,11 @@
         </div>
         <button type="submit" class="register-button">Register</button>
       </form>
+      <p>Already have an account? <router-link to="/login">Login</router-link></p>
     </div>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import axios from 'axios';
-
-export default defineComponent({
-  name: 'Register',
-  data() {
-    return {
-      username: '',
-      email: '',
-      password: '',
-    };
-  },
-  methods: {
-    async handleRegister() {
-      const { username, email, password } = this;
-      try {
-        const response = await axios.post('/api/auth/register', { username, email, password });
-        this.$store.dispatch('login', { user: response.data.user, token: response.data.token });
-        this.$router.push('/user-dashboard');
-      } catch (error) {
-        console.error('Error registering:', error);
-      }
-    },
-  },
-});
-</script>
 
 <style scoped>
 .register-container {

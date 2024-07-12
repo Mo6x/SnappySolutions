@@ -15,7 +15,7 @@ const users = ref<User[]>([]);
 const loading = ref(true);
 const error = ref<string | null>(null);
 
-// Fetch users function
+
 const fetchUsers = async () => {
   try {
     const response = await axios.get('https://our_site_name.com/api/user/', {
@@ -32,7 +32,7 @@ const fetchUsers = async () => {
   }
 };
 
-// Fetch users on component mount
+
 onMounted(fetchUsers);
 </script>
 

@@ -1,77 +1,58 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import axios from 'axios';
 
 
 
-export interface DataTransaction {
-  id: string;
-  details: string;
-}
 
+const network = ref('1');
+const dataType = ref('');
+const planId = ref('1');
+const phone = ref('');
+const reference = ref('');
 
-const network = ref('');
-const mobileNumber = ref('');
-const plan = ref('');
-const dataTransactions = ref<DataTransaction[]>([]);
-
-const fetchTransactions = async () => {
-  try {
-    const response = await axios.get('https://our_site_name.com/api/data/id', {
-      headers: {
-        Authorization: `Token ${import.meta.env.VITE_API_TOKEN}`,
-      },
-    });
-    dataTransactions.value = response.data;
-  } catch (error) {
-    console.log('Failed to fetch data transactions:', error);
-  }
-};
-
-
-const buyData = async () => {
+const handleSubmit = async () => {
   try {
     const response = await axios.post(
-      import.meta.env.VITE_DATA_API,
+      `${import.meta.env.VITE_API_BASE_API_URL_LIVE_SNAPPY}/v1/topup/data`,
       {
         network: network.value,
-        mobile_number: mobileNumber.value,
-        plan: plan.value,
-        Ported_number: true,
+        dataType: dataType.value,
+        planId: planId.value,
+        phone: phone.value,
+        reference: reference.value,
       },
       {
         headers: {
-          Authorization: `Token ${import.meta.env.VITE_API_TOKEN}`,
+          Authorization: `Bearer ${import.meta.env.VITE_API_KEY_SNAPPY}`,
           'Content-Type': 'application/json',
         },
       }
     );
-    console.log('Data purchase successful:', response.data);
-    await fetchTransactions();
-  } catch (error) {
-    console.log('Failed to buy data:', error.message);
+    console.log('POST request successful:', response.data);
+    network.value = '1';
+    dataType.value = '';
+    planId.value = '1';
+    phone.value = '';
+    reference.value = '';
+  } catch (error: any) {
+    console.error('Error making POST request:', error.message);
   }
 };
-
-onMounted(fetchTransactions);
 </script>
+
 
 <template>
   <div class="service-card">
     <h2>Buy Data</h2>
-    <form @submit.prevent="buyData">
+    <form @submit.prevent="handleSubmit">
       <input v-model="network" type="text" placeholder="Network ID" required />
-      <input v-model="mobileNumber" type="text" placeholder="Mobile Number" required />
-      <input v-model="plan" type="text" placeholder="Plan ID" required />
+      <input v-model="dataType" type="text" placeholder="Data Type" required />
+      <input v-model="planId" type="text" placeholder="Plan ID" required />
+      <input v-model="phone" type="text" placeholder="Phone Number" required />
+      <input v-model="reference" type="text" placeholder="Reference" required />
       <button type="submit">Buy Data</button>
     </form>
-    <h3>Data Transactions</h3>
-    <ul>
-      <li v-for="transaction in dataTransactions" :key="transaction.id">
-        <div class="transaction-id">{{ transaction.id }}</div>
-        <div class="transaction-details">{{ transaction.details }}</div>
-      </li>
-    </ul>
   </div>
 </template>
 
@@ -86,7 +67,7 @@ onMounted(fetchTransactions);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.service-card h2, .service-card h3 {
+.service-card h2 {
   color: #333;
   margin-bottom: 10px;
 }
@@ -111,17 +92,5 @@ onMounted(fetchTransactions);
 
 .service-card button:hover {
   background-color: #218838;
-}
-
-.service-card ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.service-card li {
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 4px;
-  background-color: #f1f1f1;
 }
 </style>

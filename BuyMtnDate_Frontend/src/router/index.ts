@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import RegistrationForm from '@/Auths/RegistrationForm.vue'
+import LoginForm from '@/Auths/LoginForm.vue'
 import UserDashboard from '@/components/UserDashboard.vue'
 import AdminDashboard from '@/components/AdminDashboard.vue'
 
@@ -15,9 +16,14 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/registration',
+      path: '/register',
       name: 'registrationForm',
       component:  RegistrationForm
+    },
+    {
+      path: '/login',
+      name: 'loginForm',
+      component: LoginForm
     },
     {
       path: '/userDashboard',
