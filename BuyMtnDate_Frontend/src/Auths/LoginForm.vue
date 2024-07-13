@@ -1,7 +1,8 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
+import {useAxios} from "../hooks/useAxios"
+
 
 
 export default defineComponent({
@@ -13,7 +14,10 @@ export default defineComponent({
 
     const handleLogin = async () => {
       try {
-        const response = await axios.post(import.meta.env.VITE_LOGIN_API_URL, { email: email.value, password: password.value });
+        const response = await useAxios.post("/auth/login", { email: email.value, password: password.value });
+
+        console.log({response})
+        localStorage.setItem('authToken', response.data.token)
         router.push('/userDashboard');
       } catch (error) {
         console.error('Error logging in:', error);

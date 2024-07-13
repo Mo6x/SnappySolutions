@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useAxios } from "../hooks/useAxios";
 
 
 
@@ -14,11 +14,9 @@ export default defineComponent({
     const email = ref('')
 
     const handleRegister = async () => {
-
-      console.log({username:username.value, email:email.value, password:password.value})
       try {
-        const response = await axios.post(import.meta.env.VITE_REGISTER_API_URL, { username:username.value, email:email.value, password: password.value });
-        router.push('/userDashboard');
+        const response = await useAxios.post("/auth/register", { username:username.value, email:email.value, password: password.value });
+        router.push('/login');
       } catch (error) {
         console.error('Error registering:', error);
       }

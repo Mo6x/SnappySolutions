@@ -2,43 +2,60 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
+import { useAxios } from "../hooks/useAxios"
 
 
+
+interface Transactions {
+  createdAt: string;
+  network: string;
+  phone: string;
+  planId: string;
+  reference: string;
+  updatedAt: string;
+  userId: string;
+  __v: number;
+  _id: string;
+}
 
 const router = useRouter();
 
-const transactions = ref([] as any[]);
+const transactions = ref<Transactions[]>([]);
 const loading = ref(true);
-const selectedTransaction = ref(null as any);
+const selectedTransaction = ref<Transactions | null>(null);
+
+
+const getToken = (): string => {
+  const token = localStorage.getItem('authToken');
+  return token ? token : '';
+};
+
 
 const fetchTransactions = async () => {
   try {
-    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/transactions`, {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-      },
-    });
+   
+    const response = await useAxios.get("/data");
+
     transactions.value = response.data.transactions;
-    loading.value = false;
   } catch (error) {
     console.error('Error fetching transactions:', error);
+  } finally {
     loading.value = false;
   }
 };
 
-const viewTransaction = (transaction: any) => {
+const viewTransaction = (transaction: Transactions) => {
   selectedTransaction.value = transaction;
 };
 
 const deleteTransaction = async (transactionId: string) => {
   try {
-    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/transactions/${transactionId}`, {
+    await axios.delete(`http://localhost:8000/api/data/${transactionId}`, {
       headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_API_KEY}`,
-      },
+        Authorization: `Bearer ${getToken()}`
+      }
     });
     fetchTransactions();
-    selectedTransaction.value = null;
   } catch (error) {
     console.error('Error deleting transaction:', error);
   }
@@ -58,7 +75,7 @@ onMounted(fetchTransactions);
         <h2>Admin Dashboard - Transactions</h2>
         <button @click="handleClose" class="close-button">Close</button>
       </div>
-      <div v-if="loading">Loading...</div>
+      <div v-if="loading" class="loading-spinner"></div>
       <div v-else>
         <table v-if="transactions.length > 0">
           <thead>
@@ -114,15 +131,16 @@ onMounted(fetchTransactions);
   align-items: center;
   min-height: 100vh;
   background-color: #f5f5f5;
+  padding: 20px;
 }
 
 .dashboard-card {
   background-color: #fff;
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
   width: 100%;
+  max-width: 1200px;
 }
 
 .header {
@@ -133,16 +151,17 @@ onMounted(fetchTransactions);
 }
 
 .header h2 {
-  font-size: 24px;
+  font-size: 26px;
   color: #333;
+  font-weight: bold;
 }
 
 .close-button {
-  padding: 8px 16px;
+  padding: 10px 20px;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -154,23 +173,35 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 table th, table td {
-  border: 1px solid #ccc;
-  padding: 10px;
+  border: 1px solid #ddd;
+  padding: 15px;
+  text-align: left;
 }
 
 table th {
-  background-color: #f5f5f5;
+  background-color: #007bff;
+  color: white;
+}
+
+table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+table tr:hover {
+  background-color: #f1f1f1;
 }
 
 .view-button {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background-color: #28a745;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -179,11 +210,11 @@ table th {
 }
 
 .delete-button {
-  padding: 6px 12px;
+  padding: 8px 16px;
   background-color: #dc3545;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
   margin-left: 5px;
 }
@@ -207,9 +238,11 @@ table th {
 .modal-content {
   background-color: #fefefe;
   margin: 15% auto;
-  padding: 20px;
+  padding: 30px;
   border: 1px solid #888;
   width: 80%;
+  max-width: 600px;
+  border-radius: 8px;
 }
 
 .close {
@@ -224,5 +257,20 @@ table th {
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+.loading-spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>

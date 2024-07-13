@@ -23,6 +23,7 @@ const networkProviders = ref<Array<{ network: string; networkId: number }>>([]);
 const products = ref<Array<{ network: string; networkId: number; name: string }>>([]);
 const selectedTab = ref<number>(1);
 
+
 const fetchNetworkProviders = async () => {
   try {
     const response = await axios.post(

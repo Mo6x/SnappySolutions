@@ -1,22 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import axios from 'axios';
+import { useAxios } from '../hooks/useAxios';
 
 
 
-const network = ref('1');
-const dataType = ref('');
-const planId = ref('1');
+
 const phone = ref('');
-const reference = ref('');
-
 const isLoading = ref(false);
 const isSuccess = ref(false);
 const errorMessage = ref('');
-const purchaseDetails = ref({
-  accountNumber: '',
-  dataAmount: '',
-});
+const mobileNumber = ref('');
 
 const handleSubmit = async () => {
   isLoading.value = true;
@@ -24,33 +17,18 @@ const handleSubmit = async () => {
   isSuccess.value = false;
 
   try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_API_BASE_API_URL_LIVE_SNAPPY}/v1/topup/data`,
+    const response = await useAxios.post(
+      '/data',
       {
-        network: network.value,
-        dataType: dataType.value,
-        planId: planId.value,
-        phone: phone.value,
-        reference: reference.value,
+        phone: phone.value
       },
-      {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_API_KEY_SNAPPY}`,
-          'Content-Type': 'application/json',
-        },
-      }
     );
+
     console.log('POST request successful:', response.data);
 
-    purchaseDetails.value.accountNumber = phone.value;
-    purchaseDetails.value.dataAmount = dataType.value;
-
-    network.value = '1';
-    dataType.value = '';
-    planId.value = '1';
+    mobileNumber.value = phone.value;
     phone.value = '';
-    reference.value = '';
-    
+
     isSuccess.value = true;
   } catch (error: any) {
     console.error('Error making POST request:', error.message);
@@ -62,32 +40,18 @@ const handleSubmit = async () => {
 
 const handleBackToDashboard = () => {
   isSuccess.value = false;
-  network.value = '1';
-  dataType.value = '';
-  planId.value = '1';
   phone.value = '';
-  reference.value = '';
 };
 </script>
+
 
 <template>
   <div class="service-card">
     <h2>Buy Data</h2>
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
-        <input v-model="network" type="text" placeholder="Network ID" required />
-      </div>
-      <div class="form-group">
-        <input v-model="dataType" type="text" placeholder="Data Type" required />
-      </div>
-      <div class="form-group">
-        <input v-model="planId" type="text" placeholder="Plan ID" required />
-      </div>
-      <div class="form-group">
-        <input v-model="phone" type="text" placeholder="Phone Number" required />
-      </div>
-      <div class="form-group">
-        <input v-model="reference" type="text" placeholder="Reference" required />
+        <label for="phone">Phone Number</label>
+        <input v-model="phone" type="text" id="phone" required />
       </div>
       <button type="submit" class="button" :disabled="isLoading">Buy Data</button>
     </form>
@@ -97,10 +61,12 @@ const handleBackToDashboard = () => {
       <p>Processing your purchase...</p>
     </div>
 
-    <div v-if="isSuccess" class="success-message">
-      <h3>Successfully purchased {{ purchaseDetails.dataAmount }} of data!</h3>
-      <p>Account Number: {{ purchaseDetails.accountNumber }}</p>
-      <button @click="handleBackToDashboard" class="button">Back to Dashboard</button>
+    <div v-if="isSuccess" class="modal">
+      <div class="modal-content">
+        <h3>Successfully purchased data!</h3>
+        <p>Mobile Number: {{ mobileNumber }}</p>
+        <button @click="handleBackToDashboard" class="button">Close</button>
+      </div>
     </div>
 
     <div v-if="errorMessage" class="error-message">
@@ -108,6 +74,8 @@ const handleBackToDashboard = () => {
     </div>
   </div>
 </template>
+
+
 
 <style scoped>
 .service-card {
@@ -127,6 +95,13 @@ const handleBackToDashboard = () => {
 
 .service-card .form-group {
   margin-bottom: 15px;
+  text-align: left;
+}
+
+.service-card label {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
 }
 
 .service-card input {
@@ -174,11 +149,27 @@ const handleBackToDashboard = () => {
   }
 }
 
-.success-message, .error-message {
-  margin-top: 20px;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.success-message h3, .error-message p {
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.success-message h3 {
   color: #28a745;
 }
 
