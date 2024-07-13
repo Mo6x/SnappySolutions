@@ -2,22 +2,26 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import DataService from './DataService.vue';
+import { useRouter } from 'vue-router';
 
 
 
-const handleLogout = () => {
-  console.log('Logging out...');
+const router = useRouter();
+const handleAdminDashboard = () => {
+  router.push('/adminDashboard');
 };
 
-const userIcon = faUser;
+const handleClose = () => {
+  router.push('/register');
+};
 
+const closeIcon = faTimes;
 
 const networkProviders = ref<Array<{ network: string; networkId: number }>>([]);
 const products = ref<Array<{ network: string; networkId: number; name: string }>>([]);
 const selectedTab = ref<number>(1);
-
 
 const fetchNetworkProviders = async () => {
   try {
@@ -38,7 +42,6 @@ const fetchNetworkProviders = async () => {
   }
 };
 
-
 const fetchData = async (networkId: number) => {
   try {
     const response = await axios.post(
@@ -49,7 +52,7 @@ const fetchData = async (networkId: number) => {
           Authorization: `Bearer ${import.meta.env.VITE_API_KEY_SNAPPY}`,
         },
       }
-    );    
+    );
     if (response.data.status) {
       products.value = response.data.data.product;
     }
@@ -58,12 +61,10 @@ const fetchData = async (networkId: number) => {
   }
 };
 
-
 onMounted(() => {
   fetchNetworkProviders();
   fetchData(selectedTab.value);
 });
-
 
 const handleTabClick = (networkId: number) => {
   selectedTab.value = networkId;
@@ -76,14 +77,15 @@ const handleTabClick = (networkId: number) => {
     <div class="header">
       <h1>User Dashboard</h1>
       <div class="user-profile">
-        <font-awesome-icon :icon="userIcon" class="profile-icon" />
-        <span class="username">John Doe</span>
+        <button @click="handleAdminDashboard">Admin Dashboard</button>
+        <button @click="handleClose" class="close-button">
+          <font-awesome-icon :icon="closeIcon" />
+        </button>
       </div>
-      <button @click="handleLogout">Logout</button>
+      
     </div>
     <div class="services">
       <DataService />
-     
     </div>
     <div class="tabs">
       <button v-for="provider in networkProviders" :key="provider.networkId" 
@@ -116,20 +118,21 @@ const handleTabClick = (networkId: number) => {
 
 <style scoped>
 .dashboard {
-  width: 550px;
+  width: 100%;
+  max-width: 700px;
   margin: 50px auto;
   padding: 20px;
+  background: #ffffff;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header {
   display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
-  justify-content: space-between;
 }
 
 .header h1 {
@@ -160,10 +163,22 @@ const handleTabClick = (networkId: number) => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  margin-left: 10px;
 }
 
 .dashboard button:hover {
   background-color: #0056b3;
+}
+
+.close-button {
+  background-color: transparent;
+  color: #555;
+  border: none;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #000;
 }
 
 .services {

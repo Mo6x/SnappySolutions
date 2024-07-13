@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 
+
+const router = useRouter();
 
 const transactions = ref([] as any[]);
 const loading = ref(true);
@@ -41,15 +44,20 @@ const deleteTransaction = async (transactionId: string) => {
   }
 };
 
+const handleClose = () => {
+  router.push('/userDashboard');
+};
+
 onMounted(fetchTransactions);
 </script>
-
-
 
 <template>
   <div class="container">
     <div class="dashboard-card">
-      <h2>Admin Dashboard - Transactions</h2>
+      <div class="header">
+        <h2>Admin Dashboard - Transactions</h2>
+        <button @click="handleClose" class="close-button">Close</button>
+      </div>
       <div v-if="loading">Loading...</div>
       <div v-else>
         <table v-if="transactions.length > 0">
@@ -73,8 +81,8 @@ onMounted(fetchTransactions);
               <td>{{ transaction.planId }}</td>
               <td>{{ transaction.reference }}</td>
               <td>
-                <button @click="viewTransaction(transaction)">View</button>
-                <button @click="deleteTransaction(transaction._id)">Delete</button>
+                <button @click="viewTransaction(transaction)" class="view-button">View</button>
+                <button @click="deleteTransaction(transaction._id)" class="delete-button">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -83,7 +91,6 @@ onMounted(fetchTransactions);
       </div>
     </div>
 
-    <!-- Transaction Details Modal -->
     <div class="modal" v-if="selectedTransaction">
       <div class="modal-content">
         <span class="close" @click="selectedTransaction = null">&times;</span>
@@ -94,12 +101,11 @@ onMounted(fetchTransactions);
         <p><strong>Network:</strong> {{ selectedTransaction.network }}</p>
         <p><strong>Plan ID:</strong> {{ selectedTransaction.planId }}</p>
         <p><strong>Reference:</strong> {{ selectedTransaction.reference }}</p>
-        <button @click="deleteTransaction(selectedTransaction._id)">Delete Transaction</button>
+        <button @click="deleteTransaction(selectedTransaction._id)" class="delete-button">Delete Transaction</button>
       </div>
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .container {
@@ -117,13 +123,31 @@ onMounted(fetchTransactions);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   max-width: 800px;
   width: 100%;
-  text-align: center;
 }
 
-.dashboard-card h2 {
-  font-size: 24px;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.header h2 {
+  font-size: 24px;
   color: #333;
+}
+
+.close-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background-color: #0056b3;
 }
 
 table {
@@ -139,6 +163,33 @@ table th, table td {
 
 table th {
   background-color: #f5f5f5;
+}
+
+.view-button {
+  padding: 6px 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.view-button:hover {
+  background-color: #218838;
+}
+
+.delete-button {
+  padding: 6px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
 }
 
 .modal {
@@ -175,5 +226,3 @@ table th {
   cursor: pointer;
 }
 </style>
-
- 
