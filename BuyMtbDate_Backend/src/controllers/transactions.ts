@@ -16,14 +16,15 @@ export const buyData = async (req: CustomRequest, res: Response) => {
          dataType: "SME",
          planId: "1",
          network: "1",
-         reference: `202407120919${extraReference}`
+         reference: `2024071302${extraReference}`
       }
-      const response = await axios.post('https://b2b.eazymobile.ng/api/live', payload, {
+      const response = await axios.post('https://b2b.eazymobile.ng/api/live/v1/topup/data', payload, {
          headers: {
             Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json'
          }
       })
+
     
       const newTransaction = new Transactions({
          userId: req.user!.id,
@@ -38,8 +39,10 @@ export const buyData = async (req: CustomRequest, res: Response) => {
       res.status(201).json({
          message: 'Operation successful',
          newTransaction,
+         eazyMoneyResponse: response.data
       })
-      
+
+
    } catch (error) {
       throw error;
    }
