@@ -10,7 +10,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
   
   const { username, email, password } = req.body;
 
-  console.log({username, email, password})
 
   try {
     let user = await User.findOne({ email });
@@ -42,7 +41,6 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       res.json({ token });
     });
   } catch (error) {
-    console.error('Error registering user:', error);
     res.status(500).send('Server Error');
   }
 };
